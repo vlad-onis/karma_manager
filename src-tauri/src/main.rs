@@ -6,10 +6,8 @@ mod model;
 mod service;
 mod storage;
 
-use tracing::{error, info, Level};
+use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
-
-use storage::{db::DbManager, user_repository::UserRepository};
 
 fn set_tracing() {
     let subscriber = FmtSubscriber::builder()
@@ -21,6 +19,7 @@ fn set_tracing() {
 #[tokio::main]
 async fn main() {
     set_tracing();
+
     tauri::Builder::default()
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
