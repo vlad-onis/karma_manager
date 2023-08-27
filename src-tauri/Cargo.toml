@@ -18,9 +18,18 @@ tauri-build = { version = "1.4.0", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.4.0", features = [] }
+thiserror = "1.0.40"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = ["json"] }
+sqlx = { version = "0.7.1", features = ["runtime-tokio-native-tls", "sqlite", "mysql"] }
+tokio = { version = "1.28.0", features = ["full"] }
+clap = { version = "4.2.7", features = ["derive"] }
+bcrypt = "0.15.0"
+async-trait = "0.1.73"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
 # If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.
 # DO NOT REMOVE!!
-custom-protocol = [ "tauri/custom-protocol" ]
+custom-protocol = ["tauri/custom-protocol"]
