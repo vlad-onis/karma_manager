@@ -40,6 +40,16 @@ impl DbManager {
             )
             .execute(&db)
             .await?;
+
+            let _query_result = sqlx::query(
+                "CREATE TABLE IF NOT EXISTS karma \
+                (id INTEGER PRIMARY KEY NOT NULL UNIQUE, \
+                purpose_type INTEGER NOT NULL, \
+                close_type INTEGER NOT NULL,
+                closed BOOLEAN NOT NULL);",
+            )
+            .execute(&db)
+            .await?;
         } else {
             db = SqlitePool::connect(db_url).await?;
             info!("Database: {db_url} already exists");
