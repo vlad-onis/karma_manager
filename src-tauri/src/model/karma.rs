@@ -62,8 +62,8 @@ impl TryFrom<i32> for KarmaType {
             1 => Ok(KarmaType::Work),
             2 => Ok(KarmaType::Social),
             3 => Ok(KarmaType::Sport),
-            4 => Ok(KarmaType::Sport),
-            5 => Ok(KarmaType::Sport),
+            4 => Ok(KarmaType::Learning),
+            5 => Ok(KarmaType::Sleeping),
             other_value => Err(KarmaError::InvalidNumericKarmaType(other_value)),
         }
     }

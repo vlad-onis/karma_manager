@@ -22,3 +22,29 @@ impl KarmaRepository for DbManager {
         Ok(karma)
     }
 }
+
+#[cfg(test)]
+pub mod karma_repository_tests {
+    use super::*;
+    use crate::{
+        model::karma::KarmaType,
+        storage::common_utilities_tests::{initialize_db, DB},
+    };
+
+    #[tokio::test]
+    async fn test_insertion() {
+        let karma = KarmaPoint::new(KarmaType::Sport);
+
+        initialize_db().await;
+        let inserted_karma = DB
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .insert_karma(karma)
+            .await
+            .expect("Failed to insert the karma point");
+
+        println!("{:?}", inserted_karma);
+    }
+}

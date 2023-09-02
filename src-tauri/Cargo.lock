@@ -135,6 +135,7 @@ dependencies = [
  "async-trait",
  "bcrypt",
  "clap",
+ "lazy_static",
  "serde",
  "serde_json",
  "sqlx",

@@ -61,6 +61,12 @@ impl DbManager {
     }
 }
 
+impl AsRef<DbManager> for DbManager {
+    fn as_ref(&self) -> &DbManager {
+        self
+    }
+}
+
 #[cfg(test)]
 pub mod db_tests {
     use super::*;

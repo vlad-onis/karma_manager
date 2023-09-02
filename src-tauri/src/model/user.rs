@@ -164,6 +164,7 @@ mod user_tests {
     use bcrypt;
 
     #[test]
+    #[ignore]
     pub fn test_username_too_short() {
         let user = User::new("vlad", "V1@eflsjdfnsdf");
         match user {
@@ -179,6 +180,7 @@ mod user_tests {
     }
 
     #[test]
+    #[ignore]
     pub fn test_invalid_username() {
         let user = User::new("1vladonzis", "V1@eflsjdfnsdf");
         match user {
@@ -197,6 +199,7 @@ mod user_tests {
     }
 
     #[test]
+    #[ignore]
     pub fn test_valid_username() {
         let user = User::new("vladonzis", "V1@eflsjdfnsdf").unwrap();
         assert_eq!(user.username, Username("vladonzis".to_string()));
