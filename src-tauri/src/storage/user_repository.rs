@@ -14,7 +14,7 @@ pub trait UserRepository {
 #[async_trait]
 impl UserRepository for DbManager {
     async fn insert_user(&self, user: User) -> Result<User, DbManagerError> {
-        let query_result = sqlx::query("INSERT INTO users(username, password) VALUES(?, ?);")
+        let _query_result = sqlx::query("INSERT INTO users(username, password) VALUES(?, ?);")
             .bind(user.username.get_username())
             .bind(user.hashed_password.get_password())
             .execute(&self.connection_pool)

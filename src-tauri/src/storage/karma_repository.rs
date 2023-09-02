@@ -11,13 +11,11 @@ pub trait KarmaRepository {
 #[async_trait]
 impl KarmaRepository for DbManager {
     async fn insert_karma(&self, karma: KarmaPoint) -> Result<KarmaPoint, DbManagerError> {
-        let _query_result =
-            sqlx::query("INSERT INTO karma(purpose_type, close_type, closed) VALUES(?, ?, ?);")
-                .bind(karma.get_purpose() as i32)
-                .bind(karma.get_close_type() as i32)
-                .bind(karma.get_closed_status())
-                .execute(&self.connection_pool)
-                .await?;
+        let _query_result = sqlx::query("INSERT INTO karma(purpose_type, name) VALUES(?, ?);")
+            .bind(karma.get_purpose() as i32)
+            .bind(karma.get_name())
+            .execute(&self.connection_pool)
+            .await?;
 
         Ok(karma)
     }
@@ -33,9 +31,10 @@ pub mod karma_repository_tests {
 
     #[tokio::test]
     async fn test_insertion() {
-        let karma = KarmaPoint::new(KarmaType::Sport);
+        let karma = KarmaPoint::new(KarmaType::Sport, "Sporty karma".to_string());
 
         initialize_db().await;
+        let name = karma.get_name();
         let inserted_karma = DB
             .lock()
             .await
@@ -45,6 +44,6 @@ pub mod karma_repository_tests {
             .await
             .expect("Failed to insert the karma point");
 
-        println!("{:?}", inserted_karma);
+        assert_eq!(name, inserted_karma.get_name());
     }
 }

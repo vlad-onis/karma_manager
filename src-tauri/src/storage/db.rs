@@ -32,6 +32,7 @@ impl DbManager {
             Sqlite::create_database(db_url).await?;
 
             db = SqlitePool::connect(db_url).await?;
+
             // Create the tables - move this to a function
             let _query_result = sqlx::query(
                 "CREATE TABLE IF NOT EXISTS users \
@@ -45,8 +46,19 @@ impl DbManager {
                 "CREATE TABLE IF NOT EXISTS karma \
                 (id INTEGER PRIMARY KEY NOT NULL UNIQUE, \
                 purpose_type INTEGER NOT NULL, \
-                close_type INTEGER NOT NULL,
-                closed BOOLEAN NOT NULL);",
+                name VARCHAR(50) NOT NULL UNIQUE);",
+            )
+            .execute(&db)
+            .await?;
+
+            let _query_result = sqlx::query(
+                "CREATE TABLE IF NOT EXISTS karma_status \
+                (id INTEGER PRIMARY KEY NOT NULL UNIQUE, \
+                karma_id INTEGER NOT NULL, \
+                closed_with_purpose_type INTEGER NOT NULL, \
+                current_state VARCHAR(50) NOT NULL, \
+                timestamp BIGINT NOT NULL, \
+                FOREIGN KEY(karma_id) REFERENCES karma(id));",
             )
             .execute(&db)
             .await?;
@@ -70,13 +82,13 @@ impl AsRef<DbManager> for DbManager {
 #[cfg(test)]
 pub mod db_tests {
     use super::*;
+    use crate::storage::common_utilities_tests::{initialize_db, DB};
 
     #[tokio::test]
     pub async fn test_db_manager() {
-        let _ = DbManager::new("test_manager.sqlite").await.unwrap();
-
+        initialize_db().await;
         assert!(std::path::Path::is_file(std::path::Path::new(
-            "test_manager.sqlite"
+            "test_db.sqlite"
         )));
     }
 }

@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
+use bcrypt::{BcryptError, DEFAULT_COST};
 use sqlx::{sqlite::SqliteRow, Error as SqlxError, FromRow, Row};
 use thiserror::Error;
 
@@ -7,6 +6,7 @@ const MIN_USERNAME_SIZE: usize = 6;
 const MIN_PASSWORD_SIZE: usize = 8;
 
 #[derive(Error, Debug)]
+#[allow(dead_code)]
 pub enum UserError {
     #[error("Failed validate password: {0}")]
     PasswordValidation(#[from] PasswordError),
@@ -16,6 +16,7 @@ pub enum UserError {
 }
 
 #[derive(Error, Debug)]
+#[allow(dead_code)]
 pub enum PasswordError {
     #[error("Failed to hash the password")]
     PasswordHash(#[from] BcryptError),
@@ -54,6 +55,7 @@ pub struct User {
     pub hashed_password: Password,
 }
 
+#[allow(dead_code)]
 impl User {
     pub fn new(username: &str, password: &str) -> Result<User, UserError> {
         let username = Username::new(username)?;
@@ -113,7 +115,7 @@ impl Password {
                 contains_uppercase_letter = true;
             }
 
-            if ch.is_digit(10) {
+            if ch.is_ascii_digit() {
                 contains_digit = true;
             }
         }

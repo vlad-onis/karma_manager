@@ -12,19 +12,17 @@ pub enum KarmaError {
 #[derive(Debug, Clone, Encode)]
 pub struct KarmaPoint {
     purpose: KarmaType,
-    close_type: KarmaType,
-    closed: bool,
+    name: String,
 }
 
 impl KarmaPoint {
-    pub fn new(purpose: KarmaType) -> KarmaPoint {
+    pub fn new(purpose: KarmaType, name: String) -> KarmaPoint {
         // Initially we set the closing type to the purpose
         // assuming it will be closed correctly, and we change that at
         // closing time
         KarmaPoint {
-            purpose: purpose.clone(),
-            close_type: purpose,
-            closed: false,
+            purpose: purpose,
+            name,
         }
     }
 
@@ -32,17 +30,8 @@ impl KarmaPoint {
         self.purpose.clone()
     }
 
-    pub fn get_close_type(&self) -> KarmaType {
-        self.close_type.clone()
-    }
-
-    pub fn get_closed_status(&self) -> bool {
-        self.closed
-    }
-
-    pub fn close(&mut self, close_type: KarmaType) {
-        self.close_type = close_type;
-        self.closed = true;
+    pub fn get_name(&self) -> String {
+        self.name.clone()
     }
 }
 
@@ -65,6 +54,41 @@ impl TryFrom<i32> for KarmaType {
             4 => Ok(KarmaType::Learning),
             5 => Ok(KarmaType::Sleeping),
             other_value => Err(KarmaError::InvalidNumericKarmaType(other_value)),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum State {
+    Active,
+    Closed,
+}
+
+impl From<String> for State {
+    fn from(value: String) -> State {
+        if value.to_lowercase() == *"active" {
+            State::Active
+        } else {
+            State::Closed
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct KarmaStatus {
+    karma_id: u32,
+    closed_with: KarmaType,
+    state: State,
+    timestamp: u64,
+}
+
+impl KarmaStatus {
+    pub fn new(karma_id: u32, closed_with: KarmaType, state: State, timestamp: u64) -> KarmaStatus {
+        KarmaStatus {
+            karma_id,
+            closed_with,
+            state,
+            timestamp,
         }
     }
 }

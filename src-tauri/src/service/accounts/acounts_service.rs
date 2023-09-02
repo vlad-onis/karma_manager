@@ -8,10 +8,12 @@ pub enum AccountsServiceError {
     DbManager(#[from] DbManagerError),
 }
 
+#[allow(dead_code)]
 pub struct AccountsService {
     db_manager: DbManager,
 }
 
+#[allow(dead_code)]
 impl AccountsService {
     pub async fn new(db_url: &str) -> Result<AccountsService, AccountsServiceError> {
         let db_manager = DbManager::new(db_url).await?;
