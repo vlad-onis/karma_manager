@@ -1,4 +1,5 @@
 use sqlx::Encode;
+use sqlx::{sqlite::SqliteRow, Error as SqlxError, FromRow, Row};
 use thiserror::Error;
 
 //todo: add name in karma model
@@ -20,10 +21,7 @@ impl KarmaPoint {
         // Initially we set the closing type to the purpose
         // assuming it will be closed correctly, and we change that at
         // closing time
-        KarmaPoint {
-            purpose: purpose,
-            name,
-        }
+        KarmaPoint { purpose, name }
     }
 
     pub fn get_purpose(&self) -> KarmaType {
@@ -32,6 +30,19 @@ impl KarmaPoint {
 
     pub fn get_name(&self) -> String {
         self.name.clone()
+    }
+}
+
+impl<'r> FromRow<'r, SqliteRow> for KarmaPoint {
+    fn from_row(row: &'r SqliteRow) -> Result<Self, SqlxError> {
+        let name: String = row.try_get("name")?;
+
+        let purpose: i32 = row.try_get("purpose")?;
+        let purpose = purpose
+            .try_into()
+            .map_err(|e| SqlxError::Decode(Box::new(e)))?;
+
+        Ok(KarmaPoint { purpose, name })
     }
 }
 

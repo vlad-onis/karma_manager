@@ -45,7 +45,7 @@ impl DbManager {
             let _query_result = sqlx::query(
                 "CREATE TABLE IF NOT EXISTS karma \
                 (id INTEGER PRIMARY KEY NOT NULL UNIQUE, \
-                purpose_type INTEGER NOT NULL, \
+                purpose INTEGER NOT NULL, \
                 name VARCHAR(50) NOT NULL UNIQUE);",
             )
             .execute(&db)
