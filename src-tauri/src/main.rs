@@ -19,7 +19,6 @@ fn set_tracing() {
 #[tokio::main]
 async fn main() {
     set_tracing();
-
     tauri::Builder::default()
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
