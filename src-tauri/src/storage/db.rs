@@ -55,9 +55,9 @@ impl DbManager {
                 "CREATE TABLE IF NOT EXISTS karma_status \
                 (id INTEGER PRIMARY KEY NOT NULL UNIQUE, \
                 karma_id INTEGER NOT NULL, \
-                closed_with_purpose_type INTEGER NOT NULL, \
+                closed_with INTEGER, \
                 current_state VARCHAR(50) NOT NULL, \
-                timestamp BIGINT NOT NULL, \
+                timestamp INTEGER NOT NULL, \
                 FOREIGN KEY(karma_id) REFERENCES karma(id));",
             )
             .execute(&db)
@@ -82,11 +82,11 @@ impl AsRef<DbManager> for DbManager {
 #[cfg(test)]
 pub mod db_tests {
     use super::*;
-    use crate::storage::common_utilities_tests::{initialize_db, DB};
+    use crate::storage::common_utilities_tests::{setup_once, DB};
 
     #[tokio::test]
     pub async fn test_db_manager() {
-        initialize_db().await;
+        setup_once().await;
         assert!(std::path::Path::is_file(std::path::Path::new(
             "test_db.sqlite"
         )));
