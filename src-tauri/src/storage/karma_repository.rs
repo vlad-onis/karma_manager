@@ -119,7 +119,6 @@ pub mod karma_repository_tests {
     #[tokio::test]
     async fn test_karma_point_operations() {
         let karma = KarmaPoint::new(KarmaType::Sport, "Sporty karma".to_string());
-
         setup_once().await;
         let name = karma.get_name();
         let inserted_karma = DB
