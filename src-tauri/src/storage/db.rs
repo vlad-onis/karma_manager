@@ -1,3 +1,4 @@
+use serde::ser::{SerializeStruct, Serializer};
 use sqlx::{migrate::MigrateDatabase, Error as SqlxError, Sqlite, SqlitePool};
 use thiserror::Error;
 use tracing::info;
@@ -6,6 +7,23 @@ use tracing::info;
 pub enum DbManagerError {
     #[error("Failed to open the connection to the db: {0}")]
     OpenConnection(#[from] SqlxError),
+}
+
+impl serde::Serialize for DbManagerError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("DbManagerError", 1)?;
+
+        match self {
+            DbManagerError::OpenConnection(external_err) => {
+                // Serialize the fact that it's an external error, but omit the inner error
+                state.serialize_field("kind", "external")?;
+                state.end()
+            } // Handle other error variants if needed
+        }
+    }
 }
 
 #[allow(dead_code)]

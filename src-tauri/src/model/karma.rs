@@ -1,10 +1,10 @@
+use serde::Serialize;
 use sqlx::Encode;
 use sqlx::{sqlite::SqliteRow, Error as SqlxError, FromRow, Row};
 use thiserror::Error;
-
 //todo: add name in karma model
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Serialize)]
 pub enum KarmaError {
     #[error("Could not convert {0} into a Karma Type")]
     InvalidNumericKarmaType(i32),
@@ -13,7 +13,7 @@ pub enum KarmaError {
     UnsupportedStatus(String),
 }
 
-#[derive(Debug, Clone, Encode)]
+#[derive(Debug, Clone, Encode, Serialize)]
 pub struct KarmaPoint {
     id: Option<i32>,
     purpose: KarmaType,
@@ -94,7 +94,7 @@ impl<'r> FromRow<'r, SqliteRow> for KarmaStatus {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub enum KarmaType {
     Work = 1,
     Social = 2,
@@ -117,7 +117,7 @@ impl TryFrom<i32> for KarmaType {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub enum State {
     Active,
     Closed,
@@ -133,7 +133,7 @@ impl From<String> for State {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct KarmaStatus {
     pub karma_id: i32,
     pub closed_with: Option<KarmaType>,

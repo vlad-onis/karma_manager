@@ -1,7 +1,7 @@
 <script>
-    import Login from "$lib/Login.svelte";
+    import Karma from "$lib/Karma.svelte";
 </script>
 
 <h1>Welcome to SvelteKit</h1>
-<Login />
+<Karma />
 

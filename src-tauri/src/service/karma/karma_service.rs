@@ -2,9 +2,10 @@ use crate::model::karma::KarmaPoint;
 use crate::storage::db::DbManagerError;
 use crate::storage::karma_repository::KarmaRepository;
 
+use serde::Serialize;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Serialize)]
 pub enum KarmaServiceError {
     #[error("Storage failed with: {0}")]
     Storage(#[from] DbManagerError),
