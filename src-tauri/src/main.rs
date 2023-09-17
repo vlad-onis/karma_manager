@@ -6,9 +6,9 @@ mod model;
 mod service;
 mod storage;
 
+use api::karma_api::create::create_karma;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
-
 fn set_tracing() {
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::DEBUG)
@@ -20,6 +20,7 @@ fn set_tracing() {
 async fn main() {
     set_tracing();
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![create_karma])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
