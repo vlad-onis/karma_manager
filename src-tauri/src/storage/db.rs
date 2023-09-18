@@ -3,12 +3,20 @@ use sqlx::{migrate::MigrateDatabase, Error as SqlxError, Sqlite, SqlitePool};
 use thiserror::Error;
 use tracing::info;
 
+use super::karma_repository::KarmaRepositoryError;
+
 #[derive(Debug, Error)]
 pub enum DbManagerError {
     #[error("Failed to open the connection to the db: {0}")]
     OpenConnection(#[from] SqlxError),
+
+    #[error("Karma repository failure: {0}")]
+    KarmaRepositoryFailure(#[from] KarmaRepositoryError),
 }
 
+// Serialize is needed by tauri when returning results from handlers
+// In this case DBManagerError references the SqlxError which does not implement Serialize
+// hence we need the custom Serialization
 impl serde::Serialize for DbManagerError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -21,7 +29,12 @@ impl serde::Serialize for DbManagerError {
                 // Serialize the fact that it's an external error, but omit the inner error
                 state.serialize_field("kind", "external")?;
                 state.end()
-            } // Handle other error variants if needed
+            }
+            DbManagerError::KarmaRepositoryFailure(external_err) => {
+                // Serialize the fact that it's an external error, but omit the inner error
+                state.serialize_field("kind", "external")?;
+                state.end()
+            }
         }
     }
 }
