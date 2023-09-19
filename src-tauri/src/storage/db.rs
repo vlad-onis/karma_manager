@@ -39,7 +39,7 @@ impl serde::Serialize for DbManagerError {
     }
 }
 
-#[allow(dead_code)]
+#[derive(Debug)]
 pub struct DbManager {
     pub connection_pool: SqlitePool,
 }
@@ -95,7 +95,7 @@ impl DbManager {
             .await?;
         } else {
             db = SqlitePool::connect(db_url).await?;
-            info!("Database: {db_url} already exists");
+            info!("Skipping database creation: Database: {db_url} already exists");
         }
 
         // create the db connection pool

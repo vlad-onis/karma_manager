@@ -11,6 +11,7 @@ pub enum KarmaServiceError {
     Storage(#[from] DbManagerError),
 }
 
+#[derive(Debug)]
 pub struct KarmaService<R: KarmaRepository> {
     karma_repository: R,
 }
