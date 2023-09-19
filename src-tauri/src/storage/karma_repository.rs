@@ -1,7 +1,24 @@
 use async_trait::async_trait;
+use sqlx::Error as SqlxError;
+use thiserror::Error;
 
 use crate::model::karma::{KarmaPoint, KarmaStatus};
 use crate::storage::db::{DbManager, DbManagerError};
+
+#[derive(Debug, Error)]
+pub enum KarmaRepositoryError {
+    #[error("Insertion of karma point {0} failed with {1}")]
+    KarmaPointInsertionFailed(String, SqlxError),
+
+    #[error("Failed to fetch karma point {0} because {1}")]
+    KarmaPointFetchingFailed(String, SqlxError),
+
+    #[error("Insertion of karma status failed with: {0}")]
+    KarmaStatusInsertionFailed(SqlxError),
+
+    #[error("Failed to fetch karma status because: {0}")]
+    KarmaStatusFetchingFailed(SqlxError),
+}
 
 #[async_trait]
 pub trait KarmaRepository {
@@ -18,11 +35,14 @@ pub trait KarmaRepository {
 #[async_trait]
 impl KarmaRepository for DbManager {
     async fn insert_karma(&self, karma: KarmaPoint) -> Result<KarmaPoint, DbManagerError> {
+        let karma_point_name = karma.get_name();
+
         let _ = sqlx::query("INSERT INTO karma(purpose, name) VALUES(?, ?);")
             .bind(karma.get_purpose() as i32)
-            .bind(karma.get_name())
+            .bind(&karma_point_name)
             .execute(&self.connection_pool)
-            .await?;
+            .await
+            .map_err(|e| KarmaRepositoryError::KarmaPointInsertionFailed(karma_point_name, e))?;
 
         Ok(karma)
     }
@@ -30,9 +50,10 @@ impl KarmaRepository for DbManager {
     async fn get_karma_by_name(&self, name: String) -> Result<KarmaPoint, DbManagerError> {
         let karma_point_result =
             sqlx::query_as::<_, KarmaPoint>("SELECT * FROM karma WHERE name = ?;")
-                .bind(name)
+                .bind(&name)
                 .fetch_one(&self.connection_pool)
-                .await?;
+                .await
+                .map_err(|e| KarmaRepositoryError::KarmaPointFetchingFailed(name, e))?;
 
         Ok(karma_point_result)
     }
@@ -48,7 +69,8 @@ impl KarmaRepository for DbManager {
         .bind(status.state.to_string())
         .bind(status.timestamp)
         .execute(&self.connection_pool)
-        .await?;
+        .await
+        .map_err(|e| KarmaRepositoryError::KarmaStatusInsertionFailed(e))?;
 
         Ok(status)
     }
@@ -66,7 +88,8 @@ impl KarmaRepository for DbManager {
             sqlx::query_as::<_, KarmaStatus>("SELECT * FROM karma_status WHERE karma_id = ?;")
                 .bind(karma_id)
                 .fetch_one(&self.connection_pool)
-                .await?;
+                .await
+                .map_err(|e| KarmaRepositoryError::KarmaStatusFetchingFailed(e))?;
 
         Ok(karma_status_result)
     }
